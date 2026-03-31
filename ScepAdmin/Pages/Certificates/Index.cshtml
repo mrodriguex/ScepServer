@@ -1,0 +1,72 @@
+@page
+@model ScepAdmin.Pages.Certificates.IndexModel
+@{
+    ViewData["Title"] = "Certificates";
+}
+
+<h2 class="mb-4"><i class="bi bi-file-earmark-lock"></i> Certificates</h2>
+
+<div class="mb-3 d-flex gap-2">
+    <a asp-page="./Index" asp-route-Filter="All" class="btn @(Model.Filter == "All" ? "btn-dark" : "btn-outline-secondary") btn-sm">All</a>
+    <a asp-page="./Index" asp-route-Filter="Active" class="btn @(Model.Filter == "Active" ? "btn-success" : "btn-outline-success") btn-sm">Active</a>
+    <a asp-page="./Index" asp-route-Filter="Expiring" class="btn @(Model.Filter == "Expiring" ? "btn-warning" : "btn-outline-warning") btn-sm">Expiring</a>
+    <a asp-page="./Index" asp-route-Filter="Revoked" class="btn @(Model.Filter == "Revoked" ? "btn-danger" : "btn-outline-danger") btn-sm">Revoked</a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Serial Number</th>
+                    <th>Subject</th>
+                    <th>Device</th>
+                    <th>Status</th>
+                    <th>Expiry</th>
+                    <th>Renewal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Certificates.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No certificates found.</td></tr>
+                }
+                @foreach (var cert in Model.Certificates)
+                {
+                    var now = DateTime.UtcNow;
+                    var isExpiring = !cert.IsRevoked && cert.NotAfter >= now && cert.NotAfter <= now.AddDays(7);
+                    string statusBadge = cert.IsRevoked
+                        ? "<span class='badge bg-danger'>Revoked</span>"
+                        : isExpiring
+                            ? "<span class='badge bg-warning text-dark'>Expiring</span>"
+                            : "<span class='badge bg-success'>Active</span>";
+                    <tr>
+                        <td><code>@cert.SerialNumber</code></td>
+                        <td>@cert.Subject</td>
+                        <td>@cert.Device?.DeviceName</td>
+                        <td>@Html.Raw(statusBadge)</td>
+                        <td>@cert.NotAfter.ToString("yyyy-MM-dd")</td>
+                        <td>@(cert.IsRenewal ? "<span class='badge bg-info'>Yes</span>" : "-")</td>
+                        <td>
+                            @if (!cert.IsRevoked)
+                            {
+                                <form method="post" asp-page-handler="Revoke" asp-route-id="@cert.Id" style="display:inline;">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-sm btn-outline-danger"
+                                            onclick="return confirm('Revoke this certificate?')">
+                                        <i class="bi bi-x-circle"></i> Revoke
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

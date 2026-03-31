@@ -1,0 +1,37 @@
+@page
+@model ScepAdmin.Pages.Devices.IndexModel
+@{
+    ViewData["Title"] = "Devices";
+}
+
+<h2 class="mb-4"><i class="bi bi-laptop"></i> Devices</h2>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0">
+            <thead class="table-dark">
+                <tr>
+                    <th>Device Name</th>
+                    <th>Company</th>
+                    <th>Last Seen</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Devices.Any())
+                {
+                    <tr><td colspan="4" class="text-center text-muted py-4">No devices found.</td></tr>
+                }
+                @foreach (var d in Model.Devices)
+                {
+                    <tr>
+                        <td><i class="bi bi-laptop text-primary"></i> @d.DeviceName</td>
+                        <td>@d.Company?.Name</td>
+                        <td>@(d.LastSeenAt.HasValue ? d.LastSeenAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</td>
+                        <td>@d.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
