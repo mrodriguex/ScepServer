@@ -1,0 +1,55 @@
+@page
+@model ScepAdmin.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<h2 class="mb-4"><i class="bi bi-speedometer2"></i> Dashboard</h2>
+
+<div class="row g-4">
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-primary h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-building fs-2"></i>
+                <h5 class="card-title mt-2">Organizations</h5>
+                <p class="card-text display-6">@Model.TotalOrganizations</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-info h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-laptop fs-2"></i>
+                <h5 class="card-title mt-2">Devices</h5>
+                <p class="card-text display-6">@Model.TotalDevices</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-success h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-file-earmark-lock fs-2"></i>
+                <h5 class="card-title mt-2">Certificates</h5>
+                <p class="card-text display-6">@Model.TotalCertificates</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-danger h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-x-circle fs-2"></i>
+                <h5 class="card-title mt-2">Revoked</h5>
+                <p class="card-text display-6">@Model.RevokedCertificates</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-lg-2">
+        <div class="card text-bg-warning h-100">
+            <div class="card-body text-center">
+                <i class="bi bi-exclamation-triangle fs-2"></i>
+                <h5 class="card-title mt-2">Expiring (7d)</h5>
+                <p class="card-text display-6">@Model.ExpiringCertificates</p>
+            </div>
+        </div>
+    </div>
+</div>
