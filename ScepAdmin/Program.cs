@@ -15,6 +15,9 @@ builder.Services.AddScoped<IChallengeValidationService, ChallengeValidationServi
 builder.Services.AddScoped<ICertificateIssuanceService, CertificateIssuanceService>();
 builder.Services.AddScoped<ICrlService, CrlService>();
 builder.Services.AddScoped<IBootstrapService, BootstrapService>();
+builder.Services.AddSingleton<IScepRequestDecoder, ScepRequestDecoder>();
+builder.Services.AddSingleton<IScepCertificateFactory, ScepCertificateFactory>();
+builder.Services.AddSingleton<IScepResponseBuilder, ScepResponseBuilder>();
 
 var app = builder.Build();
 
