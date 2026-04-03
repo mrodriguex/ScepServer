@@ -6,29 +6,92 @@
 
 <h2 class="mb-4"><i class="bi bi-laptop"></i> Devices</h2>
 
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <div class="alert alert-info">@Model.StatusMessage</div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">Create Device</div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="Create" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Company</label>
+                <select class="form-select" name="companyId" required>
+                    <option value="">Select...</option>
+                    @foreach (var c in Model.Companies)
+                    {
+                        <option value="@c.Id">@c.Name</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Device Name</label>
+                <input class="form-control" name="deviceName" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Device Identifier</label>
+                <input class="form-control" name="deviceIdentifier" required />
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button type="submit" class="btn btn-primary w-100">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="card shadow-sm">
     <div class="card-body p-0">
-        <table class="table table-hover table-striped mb-0">
+        <table class="table table-hover table-striped mb-0 align-middle">
             <thead class="table-dark">
                 <tr>
+                    <th>ID</th>
                     <th>Device Name</th>
+                    <th>Identifier</th>
                     <th>Company</th>
                     <th>Last Seen</th>
                     <th>Created</th>
+                    <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 @if (!Model.Devices.Any())
                 {
-                    <tr><td colspan="4" class="text-center text-muted py-4">No devices found.</td></tr>
+                    <tr><td colspan="7" class="text-center text-muted py-4">No devices found.</td></tr>
                 }
                 @foreach (var d in Model.Devices)
                 {
                     <tr>
-                        <td><i class="bi bi-laptop text-primary"></i> @d.DeviceName</td>
-                        <td>@d.Company?.Name</td>
-                        <td>@(d.LastSeenAt.HasValue ? d.LastSeenAt.Value.ToString("yyyy-MM-dd HH:mm") : "-")</td>
+                        <td>@d.Id</td>
+                        <td>
+                            <input class="form-control form-control-sm" form="update-@d.Id" name="deviceName" value="@d.DeviceName" required />
+                        </td>
+                        <td>
+                            <input class="form-control form-control-sm" form="update-@d.Id" name="deviceIdentifier" value="@d.DeviceIdentifier" required />
+                        </td>
+                        <td>
+                            <select class="form-select form-select-sm" form="update-@d.Id" name="companyId" required>
+                                @foreach (var c in Model.Companies)
+                                {
+                                    <option value="@c.Id" selected="@(c.Id == d.CompanyId ? "selected" : null)">@c.Name</option>
+                                }
+                            </select>
+                        </td>
+                        <td>
+                            <input class="form-control form-control-sm" form="update-@d.Id" type="datetime-local" name="lastSeenAt"
+                                   value="@(d.LastSeenAt.HasValue ? d.LastSeenAt.Value.ToString("yyyy-MM-ddTHH:mm") : string.Empty)" />
+                        </td>
                         <td>@d.CreatedAt.ToString("yyyy-MM-dd HH:mm")</td>
+                        <td class="d-flex gap-2">
+                            <form id="update-@d.Id" method="post" asp-page-handler="Update" class="d-inline">
+                                <input type="hidden" name="id" value="@d.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                            </form>
+                            <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Delete this device?')">
+                                <input type="hidden" name="id" value="@d.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
                     </tr>
                 }
             </tbody>

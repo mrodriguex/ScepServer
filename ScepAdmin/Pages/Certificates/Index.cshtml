@@ -47,7 +47,16 @@
                         <td>@cert.Device?.DeviceName</td>
                         <td>@Html.Raw(statusBadge)</td>
                         <td>@cert.NotAfter.ToString("yyyy-MM-dd")</td>
-                        <td>@(cert.IsRenewal ? "<span class='badge bg-info'>Yes</span>" : "-")</td>
+                        <td>
+                            @if (cert.IsRenewal)
+                            {
+                                <span class="badge bg-info">Yes</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">-</span>
+                            }
+                        </td>
                         <td>
                             @if (!cert.IsRevoked)
                             {

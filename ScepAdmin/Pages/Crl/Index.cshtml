@@ -1,0 +1,59 @@
+@page
+@model ScepAdmin.Pages.Crl.IndexModel
+@{
+    ViewData["Title"] = "CRL";
+}
+
+<h2 class="mb-4"><i class="bi bi-diagram-3"></i> CRL Management</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <div class="alert alert-info">@Model.StatusMessage</div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">Operations</div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="Generate">
+            <button type="submit" class="btn btn-primary">
+                <i class="bi bi-arrow-repeat"></i> Generate CRL
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">Current Status</div>
+    <div class="card-body">
+        @if (Model.Status == null)
+        {
+            <p class="text-muted mb-0">No CRL has been generated yet.</p>
+        }
+        else
+        {
+            <dl class="row mb-0">
+                <dt class="col-sm-3">Version</dt>
+                <dd class="col-sm-9">@(Model.Status.Version?.ToString() ?? "-")</dd>
+
+                <dt class="col-sm-3">Last Generated</dt>
+                <dd class="col-sm-9">@(Model.Status.LastGeneratedAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "-") UTC</dd>
+
+                <dt class="col-sm-3">Next Update</dt>
+                <dd class="col-sm-9">@(Model.Status.NextUpdateAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "-") UTC</dd>
+
+                <dt class="col-sm-3">Is Generating</dt>
+                <dd class="col-sm-9">@(Model.Status.IsGenerating?.ToString() ?? "-")</dd>
+            </dl>
+        }
+    </div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.LastPayloadBase64))
+{
+    <div class="card shadow-sm">
+        <div class="card-header">Last Generated Payload (Base64)</div>
+        <div class="card-body">
+            <textarea class="form-control" rows="6" readonly>@Model.LastPayloadBase64</textarea>
+        </div>
+    </div>
+}

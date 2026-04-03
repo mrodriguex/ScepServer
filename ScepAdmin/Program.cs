@@ -11,6 +11,10 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddSingleton<ICertificateService, CertificateService>();
+builder.Services.AddScoped<IChallengeValidationService, ChallengeValidationService>();
+builder.Services.AddScoped<ICertificateIssuanceService, CertificateIssuanceService>();
+builder.Services.AddScoped<ICrlService, CrlService>();
+builder.Services.AddScoped<IBootstrapService, BootstrapService>();
 
 var app = builder.Build();
 

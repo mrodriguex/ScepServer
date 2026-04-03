@@ -1,0 +1,94 @@
+@page
+@model ScepAdmin.Pages.Companies.IndexModel
+@{
+    ViewData["Title"] = "Companies";
+}
+
+<h2 class="mb-4"><i class="bi bi-building"></i> Companies</h2>
+
+@if (!string.IsNullOrWhiteSpace(Model.StatusMessage))
+{
+    <div class="alert alert-info">@Model.StatusMessage</div>
+}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-header">Create Company</div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="Create" class="row g-3">
+            <div class="col-md-3">
+                <label class="form-label">Name</label>
+                <input class="form-control" name="name" required />
+            </div>
+            <div class="col-md-3">
+                <label class="form-label">Challenge Password</label>
+                <input class="form-control" name="challengePassword" required />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Intermediate Cert Path</label>
+                <input class="form-control" name="intermediateCertPath" />
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="isActive" value="true" checked />
+                    <label class="form-check-label">Active</label>
+                </div>
+            </div>
+            <div class="col-md-1 d-flex align-items-end">
+                <button class="btn btn-primary w-100" type="submit">Create</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body p-0">
+        <table class="table table-hover table-striped mb-0 align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Challenge</th>
+                    <th>Intermediate Path</th>
+                    <th>Active</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Companies.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No companies found.</td></tr>
+                }
+                @foreach (var c in Model.Companies)
+                {
+                    <tr>
+                        <td>@c.Id</td>
+                        <td>
+                            <input class="form-control form-control-sm" form="update-@c.Id" name="name" value="@c.Name" required />
+                        </td>
+                        <td>
+                            <input class="form-control form-control-sm" form="update-@c.Id" name="challengePassword" value="@c.ChallengePassword" required />
+                        </td>
+                        <td>
+                            <input class="form-control form-control-sm" form="update-@c.Id" name="intermediateCertPath" value="@c.IntermediateCertPath" />
+                        </td>
+                        <td>
+                            <input type="checkbox" form="update-@c.Id" name="isActive" value="true" @(c.IsActive ? "checked" : null) />
+                        </td>
+                        <td><small>@c.CreatedAt.ToString("yyyy-MM-dd HH:mm")</small></td>
+                        <td class="d-flex gap-2">
+                            <form id="update-@c.Id" method="post" asp-page-handler="Update" class="d-inline">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                            </form>
+                            <form method="post" asp-page-handler="Delete" class="d-inline" onsubmit="return confirm('Delete this company?')">
+                                <input type="hidden" name="id" value="@c.Id" />
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
