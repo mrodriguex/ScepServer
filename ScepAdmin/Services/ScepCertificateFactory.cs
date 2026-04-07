@@ -39,7 +39,7 @@ public sealed class ScepCertificateFactory : IScepCertificateFactory
         certGen.SetNotAfter(DateTime.UtcNow.AddDays(365));
         certGen.SetPublicKey(csr.GetPublicKey());
 
-        CopyRequestedExtensions(certGen, csr);
+        AddExtensionsFromCsr(certGen, csr);
 
         certGen.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
         certGen.AddExtension(X509Extensions.KeyUsage, true,
@@ -56,23 +56,65 @@ public sealed class ScepCertificateFactory : IScepCertificateFactory
         return certGen.Generate(new Asn1SignatureFactory("SHA256WITHRSA", caPrivKey)).GetEncoded();
     }
 
-    private static void CopyRequestedExtensions(X509V3CertificateGenerator certGen, Pkcs10CertificationRequest csr)
+    private static void AddExtensionsFromCsr(X509V3CertificateGenerator certGen, Pkcs10CertificationRequest csr)
     {
         var attrs = csr.GetCertificationRequestInfo().Attributes;
-        if (attrs == null) return;
 
-        foreach (Asn1Encodable attrEnc in attrs)
+        X509Extensions? csrExtensions = null;
+        if (attrs != null)
         {
-            var attr = Org.BouncyCastle.Asn1.Cms.Attribute.GetInstance(attrEnc);
-            if (!attr.AttrType.Equals(PkcsObjectIdentifiers.Pkcs9AtExtensionRequest))
-                continue;
-
-            var extSeq = X509Extensions.GetInstance(attr.AttrValues[0]);
-            foreach (DerObjectIdentifier extOid in extSeq.GetExtensionOids())
+            foreach (Asn1Encodable attrEnc in attrs)
             {
-                var ext = extSeq.GetExtension(extOid);
+                var attr = Org.BouncyCastle.Asn1.Cms.Attribute.GetInstance(attrEnc);
+                if (attr.AttrType.Equals(PkcsObjectIdentifiers.Pkcs9AtExtensionRequest))
+                {
+                    csrExtensions = X509Extensions.GetInstance(attr.AttrValues[0]);
+                    break;
+                }
+            }
+        }
+
+        // ── Copy all requested extensions except SAN (we rebuild SAN below) ────
+        if (csrExtensions != null)
+        {
+            foreach (DerObjectIdentifier extOid in csrExtensions.GetExtensionOids())
+            {
+                if (extOid.Equals(X509Extensions.SubjectAlternativeName))
+                    continue; // handled below
+
+                var ext = csrExtensions.GetExtension(extOid);
                 certGen.AddExtension(extOid, ext.IsCritical, ext.GetParsedValue());
             }
         }
+
+        // ── Build SAN: start from CSR entries, then ensure CN is included ──────
+        var sanNames = new List<GeneralName>();
+
+        var existingSan = csrExtensions?.GetExtension(X509Extensions.SubjectAlternativeName);
+        if (existingSan != null)
+        {
+            var parsed = GeneralNames.GetInstance(existingSan.GetParsedValue());
+            sanNames.AddRange(parsed.GetNames());
+        }
+
+        // Always include CN as a DNS SAN (RFC 2818 §3.1)
+        var cn = csr.GetCertificationRequestInfo().Subject
+            .GetValueList(X509Name.CN)
+            .Cast<string>()
+            .FirstOrDefault();
+
+        if (!string.IsNullOrWhiteSpace(cn))
+        {
+            var cnEntry = new GeneralName(GeneralName.DnsName, cn);
+            if (!sanNames.Any(n => n.TagNo == GeneralName.DnsName &&
+                                   string.Equals(n.Name.ToString(), cn, StringComparison.OrdinalIgnoreCase)))
+            {
+                sanNames.Add(cnEntry);
+            }
+        }
+
+        if (sanNames.Count > 0)
+            certGen.AddExtension(X509Extensions.SubjectAlternativeName, false,
+                new GeneralNames(sanNames.ToArray()));
     }
 }

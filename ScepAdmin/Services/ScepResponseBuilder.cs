@@ -5,6 +5,7 @@ using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Cms;
 using Org.BouncyCastle.Cms;
 using Org.BouncyCastle.Security;
+using Org.BouncyCastle.X509;
 
 namespace ScepAdmin.Services;
 
@@ -22,7 +23,12 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
         byte[] senderNonce,
         byte[] issuedCertDer)
     {
-        var encryptedPayload = Encrypt(clientCert, issuedCertDer);
+        // RFC 8894 §3.2.1: the EnvelopedData plaintext MUST be a degenerate
+        // certs-only SignedData, not raw DER bytes. jscep (and BouncyCastle Java)
+        // call new CMSSignedData(bytes) on the decrypted payload, which requires a
+        // proper ContentInfo wrapper — passing raw cert bytes causes "Malformed content".
+        var innerPayload = WrapInDegenerateSignedData(issuedCertDer);
+        var encryptedPayload = Encrypt(clientCert, innerPayload);
         return Sign(caCert, transactionId, senderNonce, pkiStatus: "0", encryptedPayload);
     }
 
@@ -33,6 +39,20 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
         int failInfo)
     {
         return Sign(caCert, transactionId, senderNonce, pkiStatus: "2", Array.Empty<byte>(), failInfo);
+    }
+
+    /// <summary>
+    /// Wraps a DER-encoded certificate in a degenerate (certs-only, no signers) SignedData.
+    /// BouncyCastle C#'s X509CertificateParser can extract the cert from this format,
+    /// and jscep/BouncyCastle Java require it for CertRep decoding.
+    /// </summary>
+    private static byte[] WrapInDegenerateSignedData(byte[] certDer)
+    {
+        var cert = new X509CertificateParser().ReadCertificate(certDer);
+        var gen  = new CmsSignedDataGenerator();
+        gen.AddCertificate(cert);
+        // encapsulate: false → eContent is absent; no signers → degenerate
+        return gen.Generate(new CmsProcessableByteArray(Array.Empty<byte>()), false).GetEncoded();
     }
 
     private static byte[] Encrypt(X509Certificate2 clientCert, byte[] payload)

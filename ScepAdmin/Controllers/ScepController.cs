@@ -1,5 +1,8 @@
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using ScepAdmin.Data;
+using ScepAdmin.Models;
 using ScepAdmin.Services;
 
 namespace ScepAdmin.Controllers;
@@ -15,6 +18,7 @@ public class ScepController : ControllerBase
     private readonly IScepRequestDecoder _requestDecoder;
     private readonly IScepCertificateFactory _certificateFactory;
     private readonly IScepResponseBuilder _responseBuilder;
+    private readonly AppDbContext _db;
     private readonly ILogger<ScepController> _logger;
 
     public ScepController(
@@ -23,6 +27,7 @@ public class ScepController : ControllerBase
         IScepRequestDecoder requestDecoder,
         IScepCertificateFactory certificateFactory,
         IScepResponseBuilder responseBuilder,
+        AppDbContext db,
         ILogger<ScepController> logger)
     {
         _certificateService = certificateService;
@@ -30,6 +35,7 @@ public class ScepController : ControllerBase
         _requestDecoder = requestDecoder;
         _certificateFactory = certificateFactory;
         _responseBuilder = responseBuilder;
+        _db = db;
         _logger = logger;
     }
 
@@ -74,7 +80,8 @@ public class ScepController : ControllerBase
             var request = _requestDecoder.Decode(requestBytes, caCert);
             _logger.LogDebug("[SCEP] transactionId={TransactionId}", request.TransactionId);
 
-            if (!await _challengeValidationService.ValidateAnyAsync(request.ChallengePassword, cancellationToken))
+            var companyId = await _challengeValidationService.GetCompanyIdAsync(request.ChallengePassword, cancellationToken);
+            if (companyId is null)
             {
                 _logger.LogWarning("[SCEP] Invalid challenge password — returning FAILURE");
                 return File(
@@ -84,6 +91,10 @@ public class ScepController : ControllerBase
 
             var certDer = _certificateFactory.Build(caCert, request.CsrBytes);
             _logger.LogDebug("[SCEP] Issued certificate ({Bytes} bytes)", certDer.Length);
+
+            await PersistIssuanceAsync(companyId.Value, certDer,
+                HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                cancellationToken);
 
             var response = _responseBuilder.BuildSuccess(
                 caCert, request.ClientCert, request.TransactionId, request.SenderNonce, certDer);
@@ -95,5 +106,62 @@ public class ScepController : ControllerBase
             _logger.LogError(ex, "[SCEP] Error processing PKIOperation");
             return StatusCode(500, ex.Message);
         }
+    }
+
+    private async Task PersistIssuanceAsync(int companyId, byte[] certDer, string clientIp, CancellationToken ct)
+    {
+        var now = DateTime.UtcNow;
+        using var issuedCert = new X509Certificate2(certDer);
+        var deviceName = issuedCert.GetNameInfo(X509NameType.SimpleName, false);
+
+        var device = await _db.Devices.FirstOrDefaultAsync(
+            d => d.CompanyId == companyId && d.DeviceName == deviceName, ct);
+
+        if (device == null)
+        {
+            device = new Device
+            {
+                CompanyId = companyId,
+                DeviceName = deviceName,
+                DeviceIdentifier = deviceName,
+                CreatedAt = now,
+                LastSeenAt = now
+            };
+            _db.Devices.Add(device);
+            await _db.SaveChangesAsync(ct);
+        }
+        else
+        {
+            device.LastSeenAt = now;
+        }
+
+        var hasPrevious = await _db.Certificates.AnyAsync(
+            c => c.DeviceId == device.Id && !c.IsRevoked, ct);
+
+        _db.Certificates.Add(new Certificate
+        {
+            CompanyId = companyId,
+            DeviceId = device.Id,
+            SerialNumber = issuedCert.SerialNumber,
+            Subject = issuedCert.Subject,
+            NotBefore = issuedCert.NotBefore.ToUniversalTime(),
+            NotAfter = issuedCert.NotAfter.ToUniversalTime(),
+            IsRevoked = false,
+            IsRenewal = hasPrevious,
+            CreatedAt = now
+        });
+
+        _db.IssuanceLogs.Add(new IssuanceLog
+        {
+            CompanyId = companyId,
+            DeviceId = device.Id,
+            Operation = "Issue",
+            Status = "Success",
+            Message = $"SCEP certificate issued. Serial={issuedCert.SerialNumber}",
+            ClientIp = clientIp,
+            CreatedAt = now
+        });
+
+        await _db.SaveChangesAsync(ct);
     }
 }

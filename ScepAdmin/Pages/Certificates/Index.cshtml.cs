@@ -3,14 +3,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using ScepAdmin.Data;
 using ScepAdmin.Models;
+using ScepAdmin.Services;
 
 namespace ScepAdmin.Pages.Certificates;
 
 public class IndexModel : PageModel
 {
     private readonly AppDbContext _db;
+    private readonly ICertificateIssuanceService _issuanceService;
 
-    public IndexModel(AppDbContext db) => _db = db;
+    public IndexModel(AppDbContext db, ICertificateIssuanceService issuanceService)
+    {
+        _db = db;
+        _issuanceService = issuanceService;
+    }
 
     public List<Certificate> Certificates { get; set; } = new();
 
@@ -41,11 +47,10 @@ public class IndexModel : PageModel
     public async Task<IActionResult> OnPostRevokeAsync(int id)
     {
         var cert = await _db.Certificates.FindAsync(id);
-        if (cert != null)
+        if (cert != null && !cert.IsRevoked)
         {
-            cert.IsRevoked = true;
-            cert.RevokedAt = DateTime.UtcNow;
-            await _db.SaveChangesAsync();
+            var clientIp = HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+            await _issuanceService.RevokeBySerialAsync(cert.SerialNumber, reason: "", clientIp);
         }
         return RedirectToPage(new { Filter });
     }

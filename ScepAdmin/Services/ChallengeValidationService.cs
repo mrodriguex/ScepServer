@@ -34,4 +34,15 @@ public class ChallengeValidationService : IChallengeValidationService
             .AsNoTracking()
             .AnyAsync(c => c.IsActive && c.ChallengePassword == challenge, cancellationToken);
     }
+
+    public async Task<int?> GetCompanyIdAsync(string challenge, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(challenge)) return null;
+
+        return await _db.Companies
+            .AsNoTracking()
+            .Where(c => c.IsActive && c.ChallengePassword == challenge)
+            .Select(c => (int?)c.Id)
+            .FirstOrDefaultAsync(cancellationToken);
+    }
 }
