@@ -52,7 +52,30 @@ ScepServer is a modern, production-ready implementation of a Simple Certificate 
 	 dotnet run --project ScepAdmin
 	 ```
 
+
+
+## Live Demo
+
+A probe version is published at: [https://scep.hookhub.app/](https://scep.hookhub.app/)
+
+---
+
 ## Usage
+
+### Admin UI
+
+- Access the web UI at `https://localhost:5001/`
+- Manage companies, devices, certificates, and view logs.
+
+#### Admin UI Screenshots
+<p align="center" style="margin-bottom:2rem;">
+	<img src="docs/assets/images/ui_1.png" alt="UI Screenshot 1" width="220"/>
+	<img src="docs/assets/images/ui_2.png" alt="UI Screenshot 2" width="220"/>
+	<img src="docs/assets/images/ui_3.png" alt="UI Screenshot 3" width="220"/>
+	<img src="docs/assets/images/ui_4.png" alt="UI Screenshot 4" width="220"/>
+	<img src="docs/assets/images/ui_5.png" alt="UI Screenshot 5" width="220"/>
+	<img src="docs/assets/images/ui_6.png" alt="UI Screenshot 6" width="220"/>
+</p>
 
 ### SCEP Endpoints
 
@@ -92,10 +115,7 @@ ScepServer is a modern, production-ready implementation of a Simple Certificate 
 		GET /api/operations/crl/status
 		```
 
-### Admin UI
 
-- Access the web UI at `https://localhost:5001/`
-- Manage companies, devices, certificates, and view logs.
 
 ## Configuration
 
@@ -170,9 +190,21 @@ ScepAdmin/
 	 ```
 
 2. **Manual Testing:**
-	 - Use the admin UI to enroll devices, issue/revoke certificates, and view logs.
-	 - Use tools like `curl` or Postman to interact with the API endpoints.
-	 - Use a SCEP client to request certificates.
+	- Use the admin UI to enroll devices, issue/revoke certificates, and view logs.
+	- Use tools like `curl` or Postman to interact with the API endpoints.
+	- Use a SCEP client to request certificates.
+
+#### Mobile SCEP Testing
+
+- The solution has been tested with the [Droid_SCEP](https://github.com/andreacappelli/Droid_SCEP) Android app for mobile certificate enrollment and management.
+- Example test flows:
+
+<p align="center" style="margin-bottom:2rem;">
+  <img src="docs/assets/images/droid_scep_test1.png" alt="Droid_SCEP Test 1" width="200"/>
+  <img src="docs/assets/images/droid_scep_test2.png" alt="Droid_SCEP Test 2" width="200"/>
+  <img src="docs/assets/images/droid_scep_test3.png" alt="Droid_SCEP Test 3" width="200"/>
+  <img src="docs/assets/images/droid_scep_test4.png" alt="Droid_SCEP Test 4" width="200"/>
+</p>
 
 3. **Seed Demo Data (Development Only):**
 	 - The `/api/bootstrap/seed` endpoint or the BootstrapService seeds demo data if the database is empty.

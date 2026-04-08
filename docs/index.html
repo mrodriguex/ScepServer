@@ -2,133 +2,252 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ScepServer – Certificate Management & SCEP</title>
-  <link rel="icon" type="image/png" href="assets/images/favicon.png" />
-  <link rel="stylesheet" href="assets/css/style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ScepServer – Certificate Management & SCEP</title>
+    <link rel="icon" type="image/png" href="assets/images/favicon.png" />
+    <link rel="stylesheet" href="assets/css/style.css" />
 </head>
 
 <body>
-  <nav class="navbar">
-    <div class="nav-container">
-      <button class="hamburger" id="hamburger">
-        <span class="bar"></span>
-        <span class="bar"></span>
-        <span class="bar"></span>
-      </button>
-      <div class="nav-menu" id="nav-menu">
-        <a href="#about" class="nav-link">About</a>
-        <a href="#features" class="nav-link">Features</a>
-        <a href="#tech" class="nav-link">Tech Stack</a>
-        <a href="#usage" class="nav-link">Usage</a>
-        <a href="#api" class="nav-link">API</a>
-        <a href="#contact" class="nav-link">Contact</a>
-      </div>
-    </div>
-  </nav>
-
-  <header class="hero">
-    <div class="hero-content">
-      <img src="assets/images/scepserver_logo.png" alt="ScepServer Logo" class="avatar">
-      <h1>ScepServer</h1>
-      <p class="subtitle">
-        Modern Certificate Management & SCEP Server for Enterprises
-      </p>
-      <div class="hero-links">
-        <a href="../README.md" target="_blank">README</a>
-        <a href="https://github.com/your-org/ScepServer" target="_blank">GitHub</a>
-        <a href="#api">API Docs</a>
-      </div>
-    </div>
-  </header>
-
-  <main>
-    <section class="section" id="about">
-      <h2>About</h2>
-      <p>
-        <strong>ScepServer</strong> is a production-ready, standards-compliant Simple Certificate Enrollment Protocol (SCEP) server and certificate management portal. It enables secure, automated certificate issuance, renewal, and revocation for managed devices, supporting scalable PKI workflows in modern enterprise environments.
-      </p>
-    </section>
-
-    <section class="section" id="features">
-      <h2>Features</h2>
-      <ul>
-        <li>Standards-compliant SCEP protocol (RFC 8894)</li>
-        <li>Automated certificate issuance, renewal, and revocation</li>
-        <li>Certificate Revocation List (CRL) generation and status tracking</li>
-        <li>Multi-tenant/company support</li>
-        <li>Device enrollment and management</li>
-        <li>Audit logging for all certificate operations</li>
-        <li>RESTful API endpoints for admin operations</li>
-        <li>Demo data seeding for development/testing</li>
-        <li>Extensible, clean architecture with SOLID principles</li>
-        <li>Built with .NET 8, ASP.NET Core, and Entity Framework Core</li>
-      </ul>
-    </section>
-
-    <section class="section" id="tech">
-      <h2>Tech Stack</h2>
-      <div class="skills-grid">
-        <div class="skill-category">
-          <h3>Backend</h3>
-          <p>.NET 8, ASP.NET Core, Entity Framework Core</p>
+    <nav class="navbar">
+        <div class="nav-container">
+            <button class="hamburger" id="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </button>
+            <div class="nav-menu" id="nav-menu">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#tech" class="nav-link">Tech Stack</a>
+                <a href="#usage" class="nav-link">Usage</a>
+                <a href="#api" class="nav-link">API</a>
+                <a href="#contact" class="nav-link">Contact</a>
+            </div>
         </div>
-        <div class="skill-category">
-          <h3>Database</h3>
-          <p>SQLite (default), SQL Server, PostgreSQL</p>
+    </nav>
+
+    <header class="hero">
+        <div class="hero-content">
+            <img src="assets/images/scepserver_logo.png" alt="ScepServer Logo" class="avatar">
+            <h1>ScepServer</h1>
+            <p class="subtitle">
+                Modern Certificate Management & SCEP Server for Enterprises
+            </p>
+            <div class="hero-links">
+                <a href="../README.md" target="_blank">README</a>
+                <a href="https://github.com/mrodriguex/ScepServer" target="_blank">GitHub</a>
+                <a href="#api">API Docs</a>
+            </div>
         </div>
-        <div class="skill-category">
-          <h3>Cryptography</h3>
-          <p>BouncyCastle (X.509, PKCS#10, PKCS#7)</p>
-        </div>
-        <div class="skill-category">
-          <h3>Frontend</h3>
-          <p>Razor Pages (admin UI)</p>
-        </div>
-        <div class="skill-category">
-          <h3>Other</h3>
-          <p>Dependency Injection, Logging</p>
-        </div>
-      </div>
-    </section>
+    </header>
 
-    <section class="section" id="usage">
-      <h2>Usage</h2>
-      <ul>
-        <li>Clone the repository and follow the <a href="../README.md" target="_blank">README</a> for setup instructions.</li>
-        <li>Access the admin UI at <code>https://localhost:5001/</code> after running the app.</li>
-        <li>Use SCEP-compatible clients to enroll and manage certificates.</li>
-      </ul>
-    </section>
+    <main>
+        <section class="section" id="about">
+            <div class="live-demo-banner" style="background:linear-gradient(90deg,#17a2b8 0%,#0d6efd 100%);color:#fff;padding:1.1rem 1.5rem 1.1rem 1.5rem;border-radius:12px;margin-bottom:2.2rem;box-shadow:0 2px 12px rgba(23,162,184,0.10);font-size:1.13rem;">
+                <strong>Live Demo:</strong> A probe version is published at
+                <a href="https://scep.hookhub.app/" target="_blank" style="color:#fff;text-decoration:underline;font-weight:600;">https://scep.hookhub.app/</a>
+            </div>
+            <h2>About</h2>
+            <p>
+                <strong>ScepServer</strong> is a production-ready, standards-compliant Simple Certificate Enrollment
+                Protocol (SCEP) server and certificate management portal. It enables secure, automated certificate
+                issuance, renewal, and revocation for managed devices, supporting scalable PKI workflows in modern
+                enterprise environments.
+            </p>
+        </section>
 
-    <section class="section" id="api">
-      <h2>API Overview</h2>
-      <p>Key endpoints:</p>
-      <ul>
-        <li><strong>Enroll Certificate:</strong> <code>POST /scep/pkiclient.exe</code></li>
-        <li><strong>Revoke Certificate:</strong> <code>POST /api/operations/revoke</code></li>
-        <li><strong>Generate CRL:</strong> <code>POST /api/operations/crl/generate</code></li>
-        <li><strong>Get CRL Status:</strong> <code>GET /api/operations/crl/status</code></li>
-      </ul>
-      <p>See <a href="../README.md" target="_blank">README</a> for request/response examples.</p>
-    </section>
+        <section class="section" id="features">
+            <h2>Features</h2>
+            <ul>
+                Modern, Secure, and Scalable SCEP Server for Enterprise PKI
+                <li>Automated certificate issuance, renewal, and revocation</li>
+                <li>Certificate Revocation List (CRL) generation and status tracking</li>
+                <li>Multi-tenant/company support</li>
+                <li>Device enrollment and management</li>
+                <li>Audit logging for all certificate operations</li>
+                <li>RESTful API endpoints for admin operations</li>
+                <li>Demo data seeding for development/testing</li>
+                <li>Extensible, clean architecture with SOLID principles</li>
+                <li>Built with .NET 8, ASP.NET Core, and Entity Framework Core</li>
+            </ul>
+        </section>
 
-    <section class="section" id="contact">
-      <h2>Contact</h2>
-      <p>Maintainer: Manuel Rodríguez Camacho</p>
-      <p>
-        <a href="https://github.com/mrodriguex" target="_blank">GitHub</a> |
-        <a href="https://www.linkedin.com/in/manuel-rodriguez-camacho/" target="_blank">LinkedIn</a>
-      </p>
-    </section>
-  </main>
+        <section class="section" id="tech">
+            <h2>Tech Stack</h2>
+            <div class="skills-grid">
+                <div class="skill-category">
+                    <h3>Backend</h3>
+                    <p>.NET 8, ASP.NET Core, Entity Framework Core</p>
+                </div>
+                <div class="skill-category">
+                    <h3>Database</h3>
+                    <p>SQLite (default), SQL Server, PostgreSQL</p>
+                </div>
+                <div class="skill-category">
+                    <h3>Frontend</h3>
+                    <p>Razor Pages (admin UI)</p>
+                </div>
+                <div class="skill-category">
+                    <h3>Other</h3>
+                    <p>Dependency Injection, Logging</p>
+                </div>
+            </div>
+        </section>
 
-  <footer>
-    <p>© <span id="year"></span> ScepServer</p>
-  </footer>
+        <section class="section" id="usage">
+            <h2>Usage</h2>
+            <h3 style="margin-bottom:1.2rem;">Admin UI</h3>
+            <ul>
+                <li><strong>Access:</strong> <code>https://localhost:5001/</code> after running the app.</li>
+                <li><strong>Navigation:</strong> Intuitive sidebar and dashboard for fast access to all management
+                    areas.</li>
+                <li><strong>Management:</strong> Companies, devices, certificates, CRL, and logs in a unified interface.
+                </li>
+                <li><strong>Search & Filter:</strong> Quickly find records with instant search and advanced filters.
+                </li>
+                <li><strong>Visual Status:</strong> Color-coded indicators for certificate and device health.</li>
+                <li><strong>Responsive:</strong> Works on desktop, tablet, and mobile browsers.</li>
+            </ul>
+            <div class="usage-gallery">
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/ui_1.png" alt="Dashboard" class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Dashboard:</strong> The central hub for administrators. Instantly see
+                        certificate inventory, active/revoked/expired counts, recent events, and system health. Quick
+                        links let you jump to any management area. Alerts and notifications highlight urgent actions,
+                        such as expiring certificates or failed enrollments. Designed for clarity and at-a-glance
+                        monitoring.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/ui_2.png" alt="Companies" class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Companies:</strong> Multi-tenant/company management. Add, edit, or deactivate
+                        companies. Assign SCEP challenge passwords, view per-company statistics, and drill down into
+                        company-specific devices and certificates. Ideal for MSPs, large organizations, or any
+                        environment with multiple business units or customers.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/ui_3.png" alt="Devices" class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Devices:</strong> Complete device inventory. Search, filter, and manage all
+                        enrolled devices. See device identifiers, display names, company association, last seen
+                        timestamps, and enrollment status. Track device lifecycle, certificate assignments, and quickly
+                        identify inactive or problematic devices.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/ui_4.png" alt="Certificates" class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Certificates:</strong> Full certificate lifecycle management. View all issued
+                        certificates, inspect details (subject, serial, validity, status), filter by company/device, and
+                        perform actions such as revocation or renewal. Visual indicators for certificate state (active,
+                        expired, revoked) and quick access to certificate history.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/ui_5.png" alt="CRL Management" class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>CRL Management:</strong> Manage Certificate Revocation Lists with ease.
+                        Generate, schedule, and review CRLs. See CRL version, last/next update, and revoked certificate
+                        serials. Initiate manual CRL generation, monitor CRL distribution, and ensure compliance with
+                        PKI best practices. Visual feedback for CRL health and update status.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/ui_6.png" alt="Issuance Logs" class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Issuance Logs:</strong> A comprehensive, filterable audit log of all certificate
+                        operations: issuance, renewal, revocation, and CRL events. Includes timestamps, operation
+                        status, client IP, and human-readable messages. Essential for compliance, troubleshooting, and
+                        security investigations.</figcaption>
+                </figure>
+            </div>
+            <style>
+                .gallery-img-responsive {
+                    width: 100%;
+                    max-width: 420px;
+                    height: auto;
+                    border-radius: 14px;
+                    box-shadow: 0 2px 12px rgba(23, 162, 184, 0.10), 0 1.5px 6px rgba(0, 0, 0, 0.04);
+                    background: #f8f9fa;
+                    transition: transform 0.18s, box-shadow 0.18s;
+                    cursor: pointer;
+                    margin-bottom: 0.5rem;
+                }
 
-  <script src="assets/js/main.js"></script>
+                .gallery-img-responsive:hover {
+                    transform: scale(1.045);
+                    box-shadow: 0 8px 32px rgba(23, 162, 184, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
+                }
+
+                .gallery-figure {
+                    flex: 1 1 320px;
+                    max-width: 440px;
+                    margin: 0 1.5rem 2.5rem 1.5rem;
+                    text-align: center;
+                }
+
+                .gallery-figure figcaption {
+                    font-size: 1.05rem;
+                    color: #444;
+                    margin-top: 0.5rem;
+                    line-height: 1.6;
+                }
+
+                @media (max-width: 900px) {
+                    .gallery-figure {
+                        max-width: 98vw;
+                        margin: 0 0 2.5rem 0;
+                    }
+                }
+            </style>
+            <h3 style="margin-bottom:1.2rem;">Mobile SCEP Testing (Droid_SCEP)</h3>
+            <ul>
+                <li>This solution has been tested with the <a href="https://github.com/andreacappelli/Droid_SCEP"
+                        target="_blank">Droid_SCEP</a> Android app for mobile certificate enrollment and management.
+                </li>
+                <li>Example test flows:</li>
+            </ul>
+            <div class="usage-gallery">
+                <img src="assets/images/droid_scep_test1.png" alt="Droid_SCEP Test 1" style="width:200px;" />
+                <img src="assets/images/droid_scep_test2.png" alt="Droid_SCEP Test 2" style="width:200px;" />
+                <img src="assets/images/droid_scep_test3.png" alt="Droid_SCEP Test 3" style="width:200px;" />
+                <img src="assets/images/droid_scep_test4.png" alt="Droid_SCEP Test 4" style="width:200px;" />
+            </div>
+        </section>
+
+        <section class="section" id="api">
+            <h2>API Overview</h2>
+            <p>Key endpoints:</p>
+            <ul>
+                <li><strong>Enroll Certificate:</strong> <code>POST /scep/pkiclient.exe</code></li>
+                <li><strong>Revoke Certificate:</strong> <code>POST /api/operations/revoke</code></li>
+                <li><strong>Generate CRL:</strong> <code>POST /api/operations/crl/generate</code></li>
+                <li><strong>Get CRL Status:</strong> <code>GET /api/operations/crl/status</code></li>
+            </ul>
+            <p>See <a href="../README.md" target="_blank">README</a> for request/response examples.</p>
+        </section>
+
+        <section class="section" id="contact">
+            <h2>Contact</h2>
+            <p>Maintainer: Manuel Rodríguez Camacho</p>
+            <p>
+                <a href="https://github.com/mrodriguex" target="_blank">GitHub</a> |
+                <a href="https://www.linkedin.com/in/manuel-rodriguez-camacho/" target="_blank">LinkedIn</a>
+            </p>
+        </section>
+    </main>
+
+    <footer>
+        <p>© <span id="year"></span> ScepServer</p>
+        <footer class="footer">
+            <p>&copy; 2026 ScepServer. All rights reserved.</p>
+        </footer>
 </body>
 
 </html>
