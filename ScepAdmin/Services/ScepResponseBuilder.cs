@@ -16,6 +16,9 @@ namespace ScepAdmin.Services;
 /// </summary>
 public sealed class ScepResponseBuilder : IScepResponseBuilder
 {
+    /// <summary>
+    /// Builds a SCEP CertRep success response: wraps the issued cert in degenerate SignedData, encrypts for client, signs with CA.
+    /// </summary>
     public byte[] BuildSuccess(
         X509Certificate2 caCert,
         X509Certificate2 clientCert,
@@ -32,6 +35,9 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
         return Sign(caCert, transactionId, senderNonce, pkiStatus: "0", encryptedPayload);
     }
 
+    /// <summary>
+    /// Builds a SCEP CertRep failure response: empty payload, failInfo attribute.
+    /// </summary>
     public byte[] BuildFailure(
         X509Certificate2 caCert,
         string? transactionId,
@@ -46,6 +52,9 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
     /// BouncyCastle C#'s X509CertificateParser can extract the cert from this format,
     /// and jscep/BouncyCastle Java require it for CertRep decoding.
     /// </summary>
+    /// <summary>
+    /// Wraps a DER-encoded certificate in a degenerate (certs-only, no signers) SignedData.
+    /// </summary>
     private static byte[] WrapInDegenerateSignedData(byte[] certDer)
     {
         var cert = new X509CertificateParser().ReadCertificate(certDer);
@@ -55,6 +64,9 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
         return gen.Generate(new CmsProcessableByteArray(Array.Empty<byte>()), false).GetEncoded();
     }
 
+    /// <summary>
+    /// Encrypts the payload for the client using EnvelopedData (AES-256-CBC).
+    /// </summary>
     private static byte[] Encrypt(X509Certificate2 clientCert, byte[] payload)
     {
         var edGen = new CmsEnvelopedDataGenerator();
@@ -62,6 +74,9 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
         return edGen.Generate(new CmsProcessableByteArray(payload), CmsEnvelopedGenerator.Aes256Cbc).GetEncoded();
     }
 
+    /// <summary>
+    /// Signs the payload with the CA key, adding SCEP attributes.
+    /// </summary>
     private static byte[] Sign(
         X509Certificate2 caCert,
         string? transactionId,
@@ -82,6 +97,9 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
         return signedGen.Generate(new CmsProcessableByteArray(innerPayload), encapsulate: true).GetEncoded();
     }
 
+    /// <summary>
+    /// Builds the SCEP attribute set for CertRep responses.
+    /// </summary>
     private static Asn1EncodableVector BuildAttributes(
         string? transactionId, byte[]? senderNonce, string pkiStatus, int? failInfo)
     {
@@ -106,6 +124,9 @@ public sealed class ScepResponseBuilder : IScepResponseBuilder
         return v;
     }
 
+    /// <summary>
+    /// Helper to create a SCEP attribute.
+    /// </summary>
     private static Org.BouncyCastle.Asn1.Cms.Attribute ScepAttribute(string oid, Asn1Encodable value)
         => new(new DerObjectIdentifier(oid), new DerSet(value));
 }

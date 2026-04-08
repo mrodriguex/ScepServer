@@ -2,19 +2,33 @@ using Microsoft.EntityFrameworkCore;
 using ScepAdmin.Data;
 using ScepAdmin.Models;
 
+
+/// <summary>
+/// Seeds demo data (company, device, certificates) for development/testing.
+/// </summary>
 namespace ScepAdmin.Services;
 
+/// <summary>
+/// Service for seeding demo data into the database.
+/// </summary>
 public class BootstrapService : IBootstrapService
 {
     private readonly AppDbContext _db;
 
+    /// <summary>
+    /// Constructs the service with a database context.
+    /// </summary>
     public BootstrapService(AppDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Seeds demo company, device, and certificates if the DB is empty.
+    /// </summary>
     public async Task<object> SeedDemoDataAsync(CancellationToken cancellationToken = default)
     {
+        // Only seed if DB is empty
         var hasAnyCompany = await _db.Companies.AnyAsync(cancellationToken);
         var hasAnyDevice = await _db.Devices.AnyAsync(cancellationToken);
         var hasAnyCertificate = await _db.Certificates.AnyAsync(cancellationToken);
@@ -30,6 +44,7 @@ public class BootstrapService : IBootstrapService
 
         var now = DateTime.UtcNow;
 
+        // Create demo company
         var company = new Company
         {
             Name = "Acme Corp",
@@ -41,6 +56,7 @@ public class BootstrapService : IBootstrapService
         _db.Companies.Add(company);
         await _db.SaveChangesAsync(cancellationToken);
 
+        // Create demo device
         var device = new Device
         {
             CompanyId = company.Id,
@@ -52,6 +68,7 @@ public class BootstrapService : IBootstrapService
         _db.Devices.Add(device);
         await _db.SaveChangesAsync(cancellationToken);
 
+        // Add demo certificates (active, expiring, revoked)
         _db.Certificates.AddRange(
             new Certificate
             {

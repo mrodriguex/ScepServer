@@ -17,8 +17,15 @@ namespace ScepAdmin.Services;
 /// </summary>
 public sealed class ScepRequestDecoder : IScepRequestDecoder
 {
+    /// <summary>
+    /// Decodes a SCEP PKIOperation request, extracting transactionId, senderNonce, CSR, challenge, and client cert.
+    /// </summary>
+    /// <param name="requestBytes">Raw PKCS#7 SignedData bytes.</param>
+    /// <param name="caCert">CA certificate (with private key for decryption).</param>
+    /// <returns>Decoded ScepPkiRequest.</returns>
     public ScepPkiRequest Decode(byte[] requestBytes, X509Certificate2 caCert)
     {
+        // Parse outer SignedData
         var outerCms    = new CmsSignedData(requestBytes);
         var signerInfos = outerCms.GetSignerInfos().GetSigners().Cast<SignerInformation>().ToList();
 
@@ -27,6 +34,7 @@ public sealed class ScepRequestDecoder : IScepRequestDecoder
 
         var signedAttrs = signerInfos[0].SignedAttributes;
 
+        // Extract SCEP attributes
         var transactionId = GetPrintableStringAttr(signedAttrs, ScepOids.TransactionId)
             ?? throw new InvalidOperationException("Missing transactionId in SCEP request.");
         var senderNonce = GetOctetStringAttr(signedAttrs, ScepOids.SenderNonce)
@@ -41,6 +49,7 @@ public sealed class ScepRequestDecoder : IScepRequestDecoder
         envelopedCms.Decrypt(new X509Certificate2Collection(caCert));
         var csrBytes = envelopedCms.ContentInfo.Content;
 
+        // Parse CSR and extract challenge and client cert
         var csr              = new Pkcs10CertificationRequest(csrBytes);
         var challengePassword = ExtractChallengePassword(csr);
         var clientCert       = ExtractClientCert(outerCms);
@@ -55,6 +64,9 @@ public sealed class ScepRequestDecoder : IScepRequestDecoder
         };
     }
 
+    /// <summary>
+    /// Extracts the challenge password from a PKCS#10 CSR, if present.
+    /// </summary>
     private static string ExtractChallengePassword(Pkcs10CertificationRequest csr)
     {
         var attrs = csr.GetCertificationRequestInfo().Attributes;
@@ -79,6 +91,9 @@ public sealed class ScepRequestDecoder : IScepRequestDecoder
         return string.Empty;
     }
 
+    /// <summary>
+    /// Extracts the client certificate from the SignedData cert store.
+    /// </summary>
     private static X509Certificate2 ExtractClientCert(CmsSignedData cms)
     {
         var certs = cms.GetCertificates().EnumerateMatches(null).Cast<BCX509Certificate>().ToList();
@@ -88,6 +103,9 @@ public sealed class ScepRequestDecoder : IScepRequestDecoder
         return new X509Certificate2(certs[0].GetEncoded());
     }
 
+    /// <summary>
+    /// Helper to extract a printable string attribute from SCEP signed attributes.
+    /// </summary>
     private static string? GetPrintableStringAttr(AttributeTable attrs, string oid)
     {
         var attr = attrs[new DerObjectIdentifier(oid)];
@@ -98,6 +116,9 @@ public sealed class ScepRequestDecoder : IScepRequestDecoder
         return val?.ToString();
     }
 
+    /// <summary>
+    /// Helper to extract an octet string attribute from SCEP signed attributes.
+    /// </summary>
     private static byte[]? GetOctetStringAttr(AttributeTable attrs, string oid)
     {
         var attr = attrs[new DerObjectIdentifier(oid)];

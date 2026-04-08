@@ -3,19 +3,33 @@ using Microsoft.EntityFrameworkCore;
 using ScepAdmin.Data;
 using ScepAdmin.Models;
 
+
+/// <summary>
+/// Handles CRL (certificate revocation list) generation and status tracking.
+/// </summary>
 namespace ScepAdmin.Services;
 
+/// <summary>
+/// Service for generating and tracking CRL status in the database.
+/// </summary>
 public class CrlService : ICrlService
 {
     private readonly AppDbContext _db;
 
+    /// <summary>
+    /// Constructs the service with a database context.
+    /// </summary>
     public CrlService(AppDbContext db)
     {
         _db = db;
     }
 
+    /// <summary>
+    /// Generates a new CRL, updates status, and logs the operation.
+    /// </summary>
     public async Task<CrlGenerationResult> GenerateAsync(CancellationToken cancellationToken = default)
     {
+        // Gather all revoked certificate serials
         var now = DateTime.UtcNow;
         var revoked = await _db.Certificates
             .AsNoTracking()
@@ -24,6 +38,7 @@ public class CrlService : ICrlService
             .Select(c => c.SerialNumber)
             .ToListAsync(cancellationToken);
 
+        // Update or create CRL status row
         var status = await _db.CrlStatuses.FirstOrDefaultAsync(cancellationToken);
         if (status == null)
         {
@@ -48,8 +63,10 @@ public class CrlService : ICrlService
         var generatedAt = status.LastGeneratedAt ?? now;
         var nextUpdateAt = status.NextUpdateAt ?? now.AddHours(24);
 
+        // Build CRL payload (not a real X.509 CRL, just a demo format)
         var payload = $"version:{version}\nlastGenerated:{generatedAt:O}\nnextUpdate:{nextUpdateAt:O}\nrevoked:{string.Join(',', revoked)}";
 
+        // Log CRL generation
         _db.IssuanceLogs.Add(new IssuanceLog
         {
             Operation = "GenerateCRL",
@@ -73,6 +90,9 @@ public class CrlService : ICrlService
         };
     }
 
+    /// <summary>
+    /// Returns the current CRL status row, if any.
+    /// </summary>
     public Task<CrlStatus?> GetStatusAsync(CancellationToken cancellationToken = default)
     {
         return _db.CrlStatuses.AsNoTracking().FirstOrDefaultAsync(cancellationToken);

@@ -16,35 +16,47 @@ namespace ScepAdmin.Services;
 
 /// <summary>
 /// Generates a signed X.509v3 end-entity certificate from a PKCS#10 CSR,
-/// copying SAN/EKU extensions and adding standard CA-issued extensions.
+/// copying requested extensions (except SAN) and always adding CN as DNS SAN.
 /// </summary>
 public sealed class ScepCertificateFactory : IScepCertificateFactory
 {
+    /// <summary>
+    /// Builds a new X.509 certificate from a CSR, copying extensions and setting validity.
+    /// </summary>
+    /// <param name="caCert">CA certificate (with private key).</param>
+    /// <param name="csrBytes">DER-encoded PKCS#10 CSR.</param>
+    /// <returns>DER-encoded X.509 certificate.</returns>
     public byte[] Build(X509Certificate2 caCert, byte[] csrBytes)
     {
+        // Extract CA private key and parse CSR
         var caPrivKey = DotNetUtilities.GetKeyPair(caCert.GetRSAPrivateKey()!).Private;
         var bcCaCert  = DotNetUtilities.FromX509Certificate(caCert);
         var csr       = new Pkcs10CertificationRequest(csrBytes);
 
-        var certGen = new X509V3CertificateGenerator();
+        var certGen = new X509V3CertificateGenerator(); // BouncyCastle cert generator
 
+        // Generate a random positive serial number
         var serialBytes = new byte[16];
         RandomNumberGenerator.Fill(serialBytes);
         serialBytes[0] &= 0x7F; // ensure positive
         certGen.SetSerialNumber(new BigInteger(serialBytes));
 
+        // Set issuer, subject, validity, and public key
         certGen.SetIssuerDN(bcCaCert.SubjectDN);
         certGen.SetSubjectDN(csr.GetCertificationRequestInfo().Subject);
         certGen.SetNotBefore(DateTime.UtcNow.AddMinutes(-5));
         certGen.SetNotAfter(DateTime.UtcNow.AddDays(365));
         certGen.SetPublicKey(csr.GetPublicKey());
 
+        // Copy requested extensions and build SAN
         AddExtensionsFromCsr(certGen, csr);
 
+        // Add standard extensions
         certGen.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(false));
         certGen.AddExtension(X509Extensions.KeyUsage, true,
             new KeyUsage(KeyUsage.DigitalSignature | KeyUsage.KeyEncipherment));
 
+        // Add SKI/AKI
         var pubKeyBytes = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(csr.GetPublicKey()).GetDerEncoded();
         certGen.AddExtension(X509Extensions.SubjectKeyIdentifier, false,
             new DerOctetString(DigestUtilities.CalculateDigest("SHA1", pubKeyBytes)));
@@ -56,6 +68,9 @@ public sealed class ScepCertificateFactory : IScepCertificateFactory
         return certGen.Generate(new Asn1SignatureFactory("SHA256WITHRSA", caPrivKey)).GetEncoded();
     }
 
+    /// <summary>
+    /// Copies requested extensions from the CSR, except SAN (which is rebuilt to always include CN).
+    /// </summary>
     private static void AddExtensionsFromCsr(X509V3CertificateGenerator certGen, Pkcs10CertificationRequest csr)
     {
         var attrs = csr.GetCertificationRequestInfo().Attributes;
@@ -63,6 +78,7 @@ public sealed class ScepCertificateFactory : IScepCertificateFactory
         X509Extensions? csrExtensions = null;
         if (attrs != null)
         {
+            // Find extensionRequest attribute
             foreach (Asn1Encodable attrEnc in attrs)
             {
                 var attr = Org.BouncyCastle.Asn1.Cms.Attribute.GetInstance(attrEnc);
@@ -74,7 +90,7 @@ public sealed class ScepCertificateFactory : IScepCertificateFactory
             }
         }
 
-        // ── Copy all requested extensions except SAN (we rebuild SAN below) ────
+        // Copy all requested extensions except SAN (we rebuild SAN below)
         if (csrExtensions != null)
         {
             foreach (DerObjectIdentifier extOid in csrExtensions.GetExtensionOids())
@@ -87,7 +103,7 @@ public sealed class ScepCertificateFactory : IScepCertificateFactory
             }
         }
 
-        // ── Build SAN: start from CSR entries, then ensure CN is included ──────
+        // Build SAN: start from CSR entries, then ensure CN is included
         var sanNames = new List<GeneralName>();
 
         var existingSan = csrExtensions?.GetExtension(X509Extensions.SubjectAlternativeName);
