@@ -45,9 +45,11 @@
 
     <main>
         <section class="section" id="about">
-            <div class="live-demo-banner" style="background:linear-gradient(90deg,#17a2b8 0%,#0d6efd 100%);color:#fff;padding:1.1rem 1.5rem 1.1rem 1.5rem;border-radius:12px;margin-bottom:2.2rem;box-shadow:0 2px 12px rgba(23,162,184,0.10);font-size:1.13rem;">
+            <div class="live-demo-banner"
+                style="background:linear-gradient(90deg,#17a2b8 0%,#0d6efd 100%);color:#fff;padding:1.1rem 1.5rem 1.1rem 1.5rem;border-radius:12px;margin-bottom:2.2rem;box-shadow:0 2px 12px rgba(23,162,184,0.10);font-size:1.13rem;">
                 <strong>Live Demo:</strong> A probe version is published at
-                <a href="https://scep.hookhub.app/" target="_blank" style="color:#fff;text-decoration:underline;font-weight:600;">https://scep.hookhub.app/</a>
+                <a href="https://scep.hookhub.app/" target="_blank"
+                    style="color:#fff;text-decoration:underline;font-weight:600;">https://scep.hookhub.app/</a>
             </div>
             <h2>About</h2>
             <p>
@@ -167,45 +169,6 @@
                         security investigations.</figcaption>
                 </figure>
             </div>
-            <style>
-                .gallery-img-responsive {
-                    width: 100%;
-                    max-width: 420px;
-                    height: auto;
-                    border-radius: 14px;
-                    box-shadow: 0 2px 12px rgba(23, 162, 184, 0.10), 0 1.5px 6px rgba(0, 0, 0, 0.04);
-                    background: #f8f9fa;
-                    transition: transform 0.18s, box-shadow 0.18s;
-                    cursor: pointer;
-                    margin-bottom: 0.5rem;
-                }
-
-                .gallery-img-responsive:hover {
-                    transform: scale(1.045);
-                    box-shadow: 0 8px 32px rgba(23, 162, 184, 0.18), 0 2px 8px rgba(0, 0, 0, 0.10);
-                }
-
-                .gallery-figure {
-                    flex: 1 1 320px;
-                    max-width: 440px;
-                    margin: 0 1.5rem 2.5rem 1.5rem;
-                    text-align: center;
-                }
-
-                .gallery-figure figcaption {
-                    font-size: 1.05rem;
-                    color: #444;
-                    margin-top: 0.5rem;
-                    line-height: 1.6;
-                }
-
-                @media (max-width: 900px) {
-                    .gallery-figure {
-                        max-width: 98vw;
-                        margin: 0 0 2.5rem 0;
-                    }
-                }
-            </style>
             <h3 style="margin-bottom:1.2rem;">Mobile SCEP Testing (Droid_SCEP)</h3>
             <ul>
                 <li>This solution has been tested with the <a href="https://github.com/andreacappelli/Droid_SCEP"
@@ -214,10 +177,46 @@
                 <li>Example test flows:</li>
             </ul>
             <div class="usage-gallery">
-                <img src="assets/images/droid_scep_test1.png" alt="Droid_SCEP Test 1" style="width:200px;" />
-                <img src="assets/images/droid_scep_test2.png" alt="Droid_SCEP Test 2" style="width:200px;" />
-                <img src="assets/images/droid_scep_test3.png" alt="Droid_SCEP Test 3" style="width:200px;" />
-                <img src="assets/images/droid_scep_test4.png" alt="Droid_SCEP Test 4" style="width:200px;" />
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/droid_scep_test1.png" alt="Droid_SCEP Test 1"
+                            class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Test 1:</strong> Initial SCEP enrollment flow. The app successfully connects to
+                        the ScepServer endpoint, retrieves the CA certificate, and initiates the enrollment process.
+                        This confirms that the server is correctly configured to handle SCEP requests from mobile
+                        clients.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/droid_scep_test2.png" alt="Droid_SCEP Test 2"
+                            class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Test 2:</strong> Certificate request submission. The app generates a certificate
+                        signing request (CSR) and submits it to the ScepServer. The server processes the request and
+                        issues a certificate, which is then installed on the device. This demonstrates the end-to-end
+                        SCEP enrollment workflow.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/droid_scep_test3.png" alt="Droid_SCEP Test 3"
+                            class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Test 3:</strong> Certificate management. After enrollment, the app displays the
+                        issued certificate details, including subject, issuer, validity period, and status. This
+                        confirms that the ScepServer is correctly issuing certificates and that the mobile client can
+                        retrieve and display certificate information.</figcaption>
+                </figure>
+                <figure class="gallery-figure card">
+                    <div class="img-wrapper">
+                        <img src="assets/images/droid_scep_test4.png" alt="Droid_SCEP Test 4"
+                            class="gallery-img-responsive" />
+                    </div>
+                    <figcaption><strong>Test 4:</strong> Certificate management. After enrollment, the app displays
+                        the issued certificate details, including subject, issuer, validity period, and status. This
+                        confirms that the ScepServer is correctly issuing certificates and that the mobile client
+                        can retrieve and display certificate information.</figcaption>
+                </figure>
             </div>
         </section>
 
