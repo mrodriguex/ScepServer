@@ -194,30 +194,26 @@ ScepAdmin/
 	- Use tools like `curl` or Postman to interact with the API endpoints.
 	- Use a SCEP client to request certificates.
 
+
 #### Mobile SCEP Testing
 
-- The solution has been tested with the [Droid_SCEP](https://github.com/andreacappelli/Droid_SCEP) Android app for mobile certificate enrollment and management.
+- This solution has been tested with the [Droid_SCEP](https://github.com/andreacappelli/Droid_SCEP) Android app for mobile certificate enrollment and management.
 - Example test flows:
 
 <p align="center" style="margin-bottom:2rem;">
-  <img src="docs/assets/images/droid_scep_test1.png" alt="Droid_SCEP Test 1" width="200"/>
-  <img src="docs/assets/images/droid_scep_test2.png" alt="Droid_SCEP Test 2" width="200"/>
-  <img src="docs/assets/images/droid_scep_test3.png" alt="Droid_SCEP Test 3" width="200"/>
-  <img src="docs/assets/images/droid_scep_test4.png" alt="Droid_SCEP Test 4" width="200"/>
+	<img src="docs/assets/images/droid_scep_test1.png" alt="Droid_SCEP Test 1" width="200"/>
+	<img src="docs/assets/images/droid_scep_test2.png" alt="Droid_SCEP Test 2" width="200"/>
+	<img src="docs/assets/images/droid_scep_test3.png" alt="Droid_SCEP Test 3" width="200"/>
+	<img src="docs/assets/images/droid_scep_test4.png" alt="Droid_SCEP Test 4" width="200"/>
 </p>
 
-3. **Seed Demo Data (Development Only):**
-	 - The `/api/bootstrap/seed` endpoint or the BootstrapService seeds demo data if the database is empty.
+**Test 1:** Initial SCEP enrollment flow. The app successfully connects to the ScepServer endpoint, retrieves the CA certificate, and initiates the enrollment process. This confirms that the server is correctly configured to handle SCEP requests from mobile clients.
 
-## Contributing
+**Test 2:** Certificate request submission. The app generates a certificate signing request (CSR) and submits it to the ScepServer. The server processes the request and issues a certificate, which is then installed on the device. This demonstrates the end-to-end SCEP enrollment workflow.
 
-Contributions are welcome! Please:
+**Test 3:** Certificate management. After enrollment, the app displays the issued certificate details, including subject, issuer, validity period, and status. This confirms that the ScepServer is correctly issuing certificates and that the mobile client can retrieve and display certificate information.
 
-- Open issues for bugs or feature requests.
-- Fork the repository and submit pull requests.
-- Follow the existing code style and add XML/inline comments.
-- Write tests for new features.
-
+**Test 4:** Certificate monitoring. The app displays the issued certificate details, including subject, issuer, validity period, and status. The app also monitors the number of days remaining before certificate expiration and warns the user when the certificate is approaching expiration. This demonstrates proactive certificate lifecycle management and user notification capabilities.
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
